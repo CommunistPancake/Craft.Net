@@ -6,13 +6,14 @@ github: SirCmpwn
 ---
 
 Over the past couple of days, I've been working on a huge refactoring of Craft.Net.Server.
-I touched almost everything, but importantly, I refactored the entire networkinging system
+I touched almost everything, but importantly, I refactored the entire networking system
 to be closer to that of [SMPRoxy](https://github.com/SirCmpwn/SMProxy.git). The unfortunate
 side-effect of this is that a ton of your code might be broken. If you rely heavily on
 direct packet control in your software, you'll need to rework all of that code. However,
 the advantages are numerous:
 
-* [Craft.Net]() is now its own library, with just networking code (client and server)
+* [Craft.Net](https://github.com/SirCmpwn/Craft.Net/tree/master/Craft.Net) is now its own
+  library, with just networking code (client and server)
 * Performance & stablity is way up
 * Memory usage is considerably improved
 * It's more organized, and easier to hack with
