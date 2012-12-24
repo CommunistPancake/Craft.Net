@@ -1,0 +1,116 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Major Refactor</title>
+        <link rel="stylesheet" type="text/css" href="/Craft.Net/css/global.css" />
+        <link rel="stylesheet" type="text/css" href="/Craft.Net/css/code/vs.css" />
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script type="text/javascript" src="/Craft.Net/js/highlight.pack.js"></script>
+        <script type="text/javascript" src="/Craft.Net/js/global.js"></script>
+    </head>
+    <body>
+        <div id="top-bar">
+            Latest Commits:
+            <div id="commits">
+                <ul>
+                    <li class="visible">Loading news...</li>
+                </ul>
+            </div>
+            <span style="float: right;">
+                <a href="https://github.com/SirCmpwn/Craft.Net/">Craft.Net on GitHub »</a>
+            </span>
+        </div>
+        <div id="wrapper">
+            <ul id="navigation">
+    <li><a href="/Craft.Net">Home</a></li>
+    <li><a href="/Craft.Net/updates.html">Updates</a></li>
+    <li><a href="https://github.com/SirCmpwn/Craft.Net">Code</a></li>
+    <li><a href="https://github.com/SirCmpwn/Craft.Net/issues/milestones">Milestones</a></li>
+    <li><a href="https://github.com/SirCmpwn/Craft.Net/wiki">Wiki</a></li>
+    <li><a href="https://github.com/SirCmpwn/Craft.Net/downloads">Downloads</a></li>
+</ul>
+            <a href="https://github.com/SirCmpwn/Craft.Net" id="fork"><img src="/Craft.Net/images/fork.png" /></a>
+			<div id="rss-feed"><a href="/Craft.Net/feed"><img src="/Craft.Net/images/rss.png" alt="rss" /></a></div>
+            <div id="content">
+                <h1>Major Refactor</h1>
+                <div class="date">24 December 2012</div>
+
+<p>Over the past couple of days, I&#8217;ve been working on a huge refactoring of Craft.Net.Server. I touched almost everything, but importantly, I refactored the entire networkinging system to be closer to that of <a href='https://github.com/SirCmpwn/SMProxy.git'>SMPRoxy</a>. The unfortunate side-effect of this is that a ton of your code might be broken. If you rely heavily on direct packet control in your software, you&#8217;ll need to rework all of that code. However, the advantages are numerous:</p>
+
+<ul>
+<li><a href=''>Craft.Net</a> is now its own library, with just networking code (client and server)</li>
+
+<li>Performance &amp; stablity is way up</li>
+
+<li>Memory usage is considerably improved</li>
+
+<li>It&#8217;s more organized, and easier to hack with</li>
+
+<li>Dependency on BouncyCastle is no more</li>
+</ul>
+
+<p>So, let&#8217;s summarize the changes in more detail.</p>
+
+<ul>
+<li>
+<p>Instead of directly writing to sockets, clients work in <a href='https://github.com/SirCmpwn/Craft.Net/blob/master/Craft.Net.Server/MinecraftServer.cs#L444'>several nested streams</a>.</p>
+</li>
+
+<li>
+<p>All packet code is kept in <a href='https://github.com/SirCmpwn/Craft.Net/tree/master/Craft.Net'>its own project</a></p>
+
+<ul>
+<li>Includes AesStream, MinecraftStream, BufferedStream for helping connections</li>
+
+<li>Includes all crypto code</li>
+
+<li>Includes all packets, client and server</li>
+
+<li>Includes Slot (now a struct) and MetadataDictionary</li>
+</ul>
+</li>
+
+<li>
+<p>No more little threads popping up all the time - all networking is handled by one thread</p>
+</li>
+
+<li>
+<p>Packet handlers are taken out of the packet code</p>
+
+<ul>
+<li>Packet code is now only for reading and writing packets</li>
+
+<li>Default handlers are registered <a href='https://github.com/SirCmpwn/Craft.Net/blob/master/Craft.Net.Server/Handlers/PacketHandlers.cs'>here</a></li>
+</ul>
+</li>
+</ul>
+
+<p>All things considered, Craft.Net is now far more performant, far more organized, and far more stable. If you need help learning about the new changes, feel free to <a href='mailto:sir@cmpwn.com'>drop me an email</a>.</p>
+
+<div class="date">By <a href="https://github.com/SirCmpwn">Drew DeVault</a></div>
+
+ <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'craftnet';
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+            </div>
+        </div>
+        <script type="text/javascript">
+          var _gaq = _gaq || [];
+          _gaq.push(['_setAccount', 'UA-34604042-1']);
+          _gaq.push(['_trackPageview']);
+          (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+          })();
+        </script>
+    </body>
+</html>
