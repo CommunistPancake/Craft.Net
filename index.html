@@ -33,27 +33,144 @@
 			<div id="rss-feed"><a href="/Craft.Net/feed"><img src="/Craft.Net/images/rss.png" alt="rss" /></a></div>
             <div id="content">
                 <h1>Craft&#46;Net</h1>
-                <p>Craft.Net is a collection of <a href='http://en.wikipedia.org/wiki/.NET_Framework'>.Net</a> libraries for working with Minecraft. It includes a minecraft server, 1.4.6 networking tools, tools for manipulating Anvil world saves, simulating block and entity interactions, and more.</p>
+                <p>Craft.Net is the collective name for several Minecraft-related .NET libraries. You can pick and choose different libraries to accomplish different tasks. Libraries are included for things such as Minecraft multiplayer networking and world editing, as well as a multiplayer client and server. The crown jewel of Craft.Net is the fully functional Minecraft server, with support for everything from survival mode resource gathering, multiplayer PvP, entity physics, and more.</p>
 
-<h2 id='getting_started'>Getting Started</h2>
+<p>Craft.Net currently supports Minecraft 1.4.6 on Windows, Linux and Mac.</p>
 
-<p>If you wish to use Craft.Net to run a Minecraft server, it&#8217;s nice and simple:</p>
+<h2 id='features'>Features</h2>
 
-<pre><code>MinecraftServer server = new MinecraftServer(new IPEndPoint(IPAddress.Any, 25565));
-server.AddLevel(new Level(&quot;world&quot;));
-server.Start();
+<p>This is not an exhaustive list.</p>
+
+<h3 id='craftnet'>Craft.Net</h3>
+
+<ul>
+<li>Full support for the 1.4.6 (version 51) Minecraft protocol</li>
+
+<li>Item stack and entity metadata manipulation</li>
+
+<li>Cryptography support that provides full interoperability with Java clients and servers</li>
+</ul>
+
+<h3 id='craftnetdata'>Craft.Net.Data</h3>
+
+<ul>
+<li>Anvil world manipulation</li>
+
+<li>All 1.4.6 items and blocks</li>
+
+<li>Entity management and physics simulation</li>
+
+<li>Custom terrain generation</li>
+
+<li>Inventory and window management</li>
+
+<li>Math helpers for common Minecraft and 3D operations</li>
+</ul>
+
+<h3 id='craftnetserver'>Craft.Net.Server</h3>
+
+<ul>
+<li>1.4.6 multiplayer server</li>
+
+<li>Provides a layer on top of Craft.Net.Data for multiplayer Minecraft</li>
+
+<li>Fast networking - low CPU and memory usage</li>
+
+<li>Modular and extensible</li>
+
+<li>In-game weather management</li>
+</ul>
+
+<h3 id='craftnetclient'>Craft.Net.Client</h3>
+
+<p><em>Craft.Net.Client is the newest addition to Craft.Net, and it is unstable and lacking in features.</em></p>
+
+<ul>
+<li>Connect to and play on 1.4.6 multiplayer servers</li>
+
+<li>Encrypt/decrypt local lastlogin files (useful for launchers)</li>
+
+<li>Liase with Minecraft.net for session authentication</li>
+</ul>
+
+<p>In short, Craft.Net is the ideal solution for any Minecraft-related activities on the .NET Framework.</p>
+
+<h2 id='usage'>Usage</h2>
+
+<p>Craft.Net is a very large, expansive project. A basic overview will be given here, but you are encouraged to <a href='https://github.com/SirCmpwn/Craft.Net/wiki'>visit the wiki</a> or the <a href='http://sircmpwn.github.com/Craft.Net'>website</a> to learn more.</p>
+
+<h3 id='general_networking'>General networking</h3>
+
+<p>Use this code to read the next Minecraft packet from a given stream, and write it to another:</p>
+
+<pre><code>var packet = PacketReader.ReadPacket(stream);
 // ...
-server.Stop();</code></pre>
+var output = new MinecraftStream(otherStream);
+packet.WriteTo(output);</code></pre>
 
-<p>If you want to manipulate an Anvil world, that&#8217;s also pretty easy. Here&#8217;s an example of changing the block at &#60;0, 0, 0&#62; in the &#8220;example&#8221; world of the user&#8217;s machine:</p>
+<p>There are also various crypto utilities for encrypting a stream with AES/CFB, or creating Minecraft- style SHA-1 hex digests, or decoding/encoding ASN.1 x509 certificates.</p>
 
-<pre><code>var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-    &quot;.minecraft&quot;, &quot;worlds&quot;, &quot;example&quot;);
-Level level = new Level(path);
-level.World.SetBlock(Vector3.Zero, new GoldBlock());
+<h3 id='servers'>Servers</h3>
+
+<p>To run a Minecraft server, simply use the following code:</p>
+
+<pre><code>var server = new MinecraftServer(new IPEndPoint(IPAddress.Any, 25565));
+var generator = new FlatlandGenerator();
+// Creates a level in the &quot;world&quot; directory, using the flatland generator
+// You may omit &quot;world&quot; to create a level in memory.
+minecraftServer.AddLevel(new Level(generator, &quot;world&quot;));
+minecraftServer.Start();</code></pre>
+
+<p>You need to create a server on a certain endpoint, then provide it a level to spawn players in, and then start the server.</p>
+
+<h3 id='clients'>Clients</h3>
+
+<p>To connect to a Minecraft server, use this code:</p>
+
+<pre><code>var session = new Session(&quot;PlayerName&quot;);
+// Uncomment this code to use the user&#39;s saved lastlogin
+//var lastLogin = LastLogin.GetLastLogin();
+//var session = Session.DoLogin(lastLogin.Username, lastLogin.Password);
+var client = new MinecraftClient(session);
+// Connect to the server at 127.0.0.1:25565
+client.Connect(new IPEndPoint(IPAddress.Loopback, 25565));</code></pre>
+
+<p>Create a client with a given session (either offline mode with just a username, or online mode with a username and password via <code>Session.DoLogin</code>. Then specify your endpoint and connect.</p>
+
+<p><a href='https://gist.github.com/8377075da938b128bef7'>Click here</a> if you want to use something like &#8220;c.nerd.nu:25565&#8221; and don&#8217;t know how.</p>
+
+<h3 id='data_manipulation'>Data Manipulation</h3>
+
+<p>Want to mess with Minecraft data but don&#8217;t need networking? Use Craft.Net.Data. Here&#8217;s an example of loading up a world and changing a block.</p>
+
+<pre><code>// Loads the level in the world directory
+var level = new Level(&quot;world&quot;);
+level.World.SetBlock(new Vector3(5, 10, 15), new DiamondBlock());
 level.Save();</code></pre>
 
-<p>You can learn more at the <a href='https://github.com/SirCmpwn/Craft.Net/wiki'>Wiki</a>.</p>
+<p>And another example for calculating the time to harvest a block with a given tool:</p>
+
+<pre><code>var block = new GoldBlock();
+short damage; // The damage the item will sustain from mining this block
+int milliseconds = block.GetHarvestTime(new DiamondPickaxe(), out damage);
+// Use this code if you want to see how long a specific entity will take,
+// with regard to things like being underwater:
+milliseconds = block.GetHarvestTime(new DiamondPickaxe(), world, playerEntity, out damage);</code></pre>
+
+<p>Or maybe you want to spawn a random painting based on the available space in the world (i.e. how vanilla Minecraft does it):</p>
+
+<pre><code>// CreateEntity(world, on which block, in which direction);
+var entity = PaintingEntity.CreateEntity(world, new Vector3(1, 2, 3), Vector3.North);
+// Creates a painting entity based on the amount of space available in the specified
+// location, choosing a random one from the list of available paintings that are the
+// required size.
+world.OnSpawnEntity(entity);</code></pre>
+
+<p>As you can likely tell, Craft.Net.Data does a lot. You might want to just browse around and see if it does what you&#8217;re looking for.</p>
+
+<h2 id='contributing'>Contributing</h2>
+
+<p>If you wish to contribute your own code to Craft.Net, please create a fork. You are encouraged to follow the code standards currently in use, and pull requests that do not will be rejected. You are also encouraged to make small, focused pull requests, rather than large, sweeping changes. For such changes, it would be better to create an issue instead. You can <a href='https://github.com/SirCmpwn/Craft.Net/pulls?direction=desc&amp;page=1&amp;sort=created&amp;state=closed'>browse other pull requests</a> and see which of them have been accepted for more guidance.</p>
 
 <h2 id='getting_help'>Getting Help</h2>
 
@@ -64,9 +181,9 @@ level.Save();</code></pre>
 <p>Craft.Net depends on the following tools and assemblies, which are included in the repository:</p>
 
 <ul>
-<li><a href='http://dotnetzip.codeplex.com/'>DotNetZip</a> is used for data compression.</li>
+<li><a href='http://dotnetzip.codeplex.com/'>DotNetZip</a> for compression/decompression with zlib</li>
 
-<li><a href='http://www.bouncycastle.org/'>BouncyCastle</a> is used for encryption.</li>
+<li><a href='https://github.com/fragmer/fNbt'>fNbt</a> for NBT data manipulation</li>
 </ul>
 
 <h2 id='licensing'>Licensing</h2>
