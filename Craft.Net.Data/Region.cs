@@ -102,7 +102,10 @@ namespace Craft.Net.Data
                                     Chunks.Add(position, chunk);
                                     break;
                                 default:
-                                    throw new InvalidDataException("Invalid compression scheme provided by region file.");
+                                    //Chunk isn't valid. Generate a new one.
+                                    Chunks.Add(position, WorldGenerator.GenerateChunk(position, this));
+                                    Console.WriteLine("Invalid compression scheme provided by region file: "+compressionMode+".");
+                                    break;
                             }
                         }
                     }
@@ -150,7 +153,9 @@ namespace Craft.Net.Data
                                     Chunks.Add(position, chunk);
                                     break;
                                 default:
-                                    throw new InvalidDataException("Invalid compression scheme provided by region file.");
+                                    Chunks.Add(position, WorldGenerator.GenerateChunk(position, this));
+                                    Console.WriteLine("Invalid compression scheme provided by region file: " + compressionMode + ".");
+                                    break;
                             }
                         }
                     }

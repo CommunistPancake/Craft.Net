@@ -8,6 +8,7 @@ using Craft.Net;
 using Craft.Net.Data;
 using Craft.Net.Data.Generation;
 using Craft.Net.Server;
+using Craft.Net.Server.Events;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -44,6 +45,7 @@ namespace MineSharp
                 ServerIP = IPAddress.Any;
             ServerPort = Config.Port;
             MCServer = new MinecraftServer(new IPEndPoint(ServerIP, ServerPort));
+            LogProvider.RegisterProvider(new MCServerLogger());
 
             //Choose the world generator based on the config file.
             if (string.IsNullOrWhiteSpace(Config.World))
@@ -61,13 +63,22 @@ namespace MineSharp
                     Generator = new DebugGenerator();
                     break;
             }
-            MCServer.AddLevel(new Level(Generator, Config.World));
+            Level l = new Level(Generator, Config.World);
+            l.GameMode = GameMode.Survival;
+            if (Config.Gamemode == Gamemode.Creative) l.GameMode = GameMode.Creative;
+            MCServer.AddLevel(l);
 
             MCServer.Settings.MotD = Config.MOTD;
             MCServer.Settings.MaxPlayers = Config.MaxPlayers;
             MCServer.Settings.OnlineMode = Config.Online;
+            MCServer.Settings.Difficulty = Config.Difficulty;
 
+            MCServer.PlayerLoggedIn += new EventHandler<Craft.Net.Server.Events.PlayerLogInEventArgs>(PlayerLoggedIn);
             MCServer.Start();
+        }
+
+        public void PlayerLoggedIn(object sender, Craft.Net.Server.Events.PlayerLogInEventArgs e)
+        {
         }
     }
 }

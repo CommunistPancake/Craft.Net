@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Craft.Net;
 
 namespace MineSharp
 {
@@ -23,7 +24,8 @@ namespace MineSharp
         public string TexturePack = "";
         public bool Online = true;
         public bool PVP = true;
-        public Gamemode Gamemode = Gamemode.Classic;
+        public Gamemode Gamemode = Gamemode.Creative;
+        public Difficulty Difficulty = Difficulty.Peaceful;
         public byte MaxPlayers = 20;
         public int ViewDistance = 10;
         public string MOTD = "A Minecraft Server";

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Craft.Net.Server;
 
 namespace MineSharp
 {
@@ -36,6 +37,16 @@ namespace MineSharp
             Console.Write("[" + type.ToString() + "] ");
             Console.ForegroundColor = ConsoleColor.Gray;
             Console.WriteLine(message);
+        }
+    }
+    public class MCServerLogger : ILogProvider
+    {
+        public void Log(string text, LogImportance level)
+        {
+            LogType t = LogType.Message;
+            if (level == LogImportance.Medium) t = LogType.Warning;
+            if (level == LogImportance.High) t = LogType.Error;
+            Logger.Log(text, t);
         }
     }
     public enum LogType

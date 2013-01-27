@@ -37,6 +37,7 @@ namespace Craft.Net.Server
         private static MinecraftStream MinecraftStream { get; set; } // Used for getting raw packet data
         public static void Log(IPacket packet, bool clientToServer)
         {
+            return; //Clogs up the console with packets
             var type = packet.GetType(); 
             var fields = type.GetFields();
             var builder = new StringBuilder();
